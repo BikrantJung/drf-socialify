@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+from datetime import timedelta
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 3rd Parties
+    'rest_framework',
+
+    # Locals
+    'account.apps.AccountConfig'
 ]
 
 MIDDLEWARE = [
@@ -69,6 +77,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'social_media.wsgi.application'
 
+AUTHENTICATION_BACKENDS = (
+    'account.backend.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -80,7 +92,16 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'account.renderers.UserRenderer',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
 
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -121,3 +142,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'account.User'
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+EMAIL_USE_TLS = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=90)
+}
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000'
+]
+
+PASSWORD_RESET_TIMEOUT = 900
