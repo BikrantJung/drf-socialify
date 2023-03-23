@@ -10,13 +10,11 @@ from .models import User
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(
-        style={'input_type': 'password'}, write_only=True)
 
     class Meta:
         model = User
         fields = ['email', 'username', 'display_name', 'password',
-                  'password2']
+                  ]
         """
         Write only True means django cannot send this data to the user on GET request.
         Only Write this data to database but cannot retrieve
@@ -27,11 +25,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, attrs):
-        password = attrs.get('password')
-        password2 = attrs.get('password2')
-        if password != password2:
-            raise serializers.ValidationError(
-                "Password and Confirm Password must match")
+
         return attrs
 
     def create(self, validate_data):
